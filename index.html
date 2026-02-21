@@ -1,0 +1,691 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Musical Keyboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;500;600&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg-dark: #0f0e14;
+      --bg-card: #1a1822;
+      --key-white: #f5f2eb;
+      --key-white-press: #e8e4dc;
+      --key-black: #1c1b22;
+      --key-black-press: #2d2b35;
+      --accent: #c9a227;
+      --accent-dim: #8b7322;
+      --text: #e8e6e3;
+      --text-muted: #8a8782;
+      --shadow: rgba(0, 0, 0, 0.4);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Outfit', sans-serif;
+      background: var(--bg-dark);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: var(--text);
+      overflow-x: hidden;
+      background-image: 
+        radial-gradient(ellipse 80% 50% at 50% -20%, rgba(201, 162, 39, 0.12), transparent),
+        radial-gradient(ellipse 60% 40% at 80% 100%, rgba(100, 80, 180, 0.08), transparent);
+    }
+
+    .container {
+      text-align: center;
+      padding: 2rem 1rem 3rem;
+    }
+
+    h1 {
+      font-weight: 600;
+      font-size: 1.75rem;
+      letter-spacing: 0.02em;
+      margin-bottom: 0.35rem;
+      background: linear-gradient(135deg, #fff 0%, var(--accent) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .subtitle {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      font-weight: 300;
+      margin-bottom: 2rem;
+    }
+
+    .piano-wrap {
+      position: relative;
+      display: inline-block;
+      padding: 1.25rem 1.5rem 1.5rem;
+      background: var(--bg-card);
+      border-radius: 16px;
+      box-shadow: 0 20px 60px var(--shadow), 0 0 0 1px rgba(255,255,255,0.04);
+    }
+
+    .piano {
+      position: relative;
+      display: flex;
+      height: 200px;
+      min-width: 560px;
+    }
+
+    .white-keys {
+      display: flex;
+      position: relative;
+      z-index: 1;
+    }
+
+    .white-key {
+      width: 44px;
+      height: 100%;
+      background: linear-gradient(180deg, var(--key-white) 0%, #eae6df 100%);
+      border: 1px solid rgba(0,0,0,0.08);
+      border-right: none;
+      border-radius: 0 0 6px 6px;
+      cursor: pointer;
+      transition: transform 0.05s ease, background 0.05s ease, box-shadow 0.05s ease;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-end;
+      padding-bottom: 12px;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.9), 0 2px 4px var(--shadow);
+    }
+
+    .white-key:last-child {
+      border-right: 1px solid rgba(0,0,0,0.08);
+    }
+
+    .white-key:hover {
+      background: linear-gradient(180deg, #faf8f3 0%, #ebe7e0 100%);
+    }
+
+    .white-key.pressed {
+      transform: translateY(3px);
+      background: linear-gradient(180deg, var(--key-white-press) 0%, #ddd9d0 100%);
+      box-shadow: inset 0 2px 6px rgba(0,0,0,0.12), 0 0 0 1px rgba(0,0,0,0.06);
+    }
+
+    .key-label {
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .black-keys {
+      position: absolute;
+      left: 0;
+      top: 0;
+      z-index: 2;
+      display: flex;
+      pointer-events: none;
+      height: 120px;
+    }
+
+    .black-key-slot {
+      width: 44px;
+      display: flex;
+      justify-content: center;
+      pointer-events: auto;
+    }
+
+    .black-key-slot:empty,
+    .black-key-slot.empty {
+      pointer-events: none;
+    }
+
+    .black-key {
+      width: 26px;
+      height: 100%;
+      background: linear-gradient(180deg, var(--key-black) 0%, #121118 100%);
+      border-radius: 0 0 4px 4px;
+      cursor: pointer;
+      transition: transform 0.05s ease, background 0.05s ease;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-end;
+      padding-bottom: 8px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.06);
+      border: 1px solid rgba(0,0,0,0.3);
+    }
+
+    .black-key:hover {
+      background: linear-gradient(180deg, #25232d 0%, #16151c 100%);
+    }
+
+    .black-key.pressed {
+      transform: translateY(2px);
+      background: linear-gradient(180deg, var(--key-black-press) 0%, #1a1920 100%);
+      box-shadow: inset 0 2px 6px rgba(0,0,0,0.4);
+    }
+
+    .black-key .key-label {
+      color: rgba(255,255,255,0.5);
+      font-size: 10px;
+    }
+
+    .hint {
+      margin-top: 1.5rem;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      max-width: 420px;
+      line-height: 1.5;
+    }
+
+    .hint kbd {
+      display: inline-block;
+      padding: 2px 6px;
+      background: rgba(255,255,255,0.08);
+      border-radius: 4px;
+      font-family: inherit;
+      font-size: 0.75em;
+    }
+
+    .start-hint {
+      margin-top: 1rem;
+      padding: 0.6rem 1rem;
+      background: rgba(201, 162, 39, 0.15);
+      border: 1px solid rgba(201, 162, 39, 0.3);
+      border-radius: 8px;
+      font-size: 0.85rem;
+      color: var(--accent);
+    }
+
+    .song-section {
+      margin-bottom: 1.5rem;
+      width: 100%;
+      max-width: 560px;
+    }
+
+    .song-controls {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+      margin-bottom: 0.75rem;
+    }
+
+    .song-controls label {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+
+    .song-controls select {
+      font-family: inherit;
+      font-size: 0.9rem;
+      padding: 0.4rem 0.75rem;
+      background: var(--bg-card);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 8px;
+      color: var(--text);
+      cursor: pointer;
+    }
+
+    .song-controls button {
+      font-family: inherit;
+      font-size: 0.85rem;
+      padding: 0.4rem 0.9rem;
+      background: var(--accent);
+      color: var(--bg-dark);
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 500;
+      transition: background 0.2s ease;
+    }
+
+    .song-controls button:hover {
+      background: #d4ad2a;
+    }
+
+    .song-controls button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .song-controls button.demo-playing {
+      background: #e74c3c;
+      animation: pulse 1.5s ease-in-out infinite;
+    }
+
+    .song-controls button.demo-playing:hover {
+      background: #c0392b;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.7; }
+    }
+
+    .notes-strip {
+      display: flex;
+      gap: 4px;
+      padding: 0.6rem 0.5rem;
+      background: var(--bg-card);
+      border-radius: 10px;
+      overflow-x: auto;
+      min-height: 52px;
+      align-items: center;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.04);
+    }
+
+    .note-pill {
+      flex-shrink: 0;
+      padding: 0.35rem 0.5rem;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      font-weight: 500;
+      background: rgba(255,255,255,0.08);
+      color: var(--text-muted);
+      border: 1px solid rgba(255,255,255,0.06);
+      min-width: 36px;
+      text-align: center;
+    }
+
+    .note-pill .key {
+      display: block;
+      font-size: 0.65rem;
+      color: var(--accent-dim);
+      margin-top: 2px;
+    }
+
+    .note-pill.current {
+      background: rgba(201, 162, 39, 0.25);
+      border-color: var(--accent);
+      color: var(--accent);
+      box-shadow: 0 0 0 1px var(--accent);
+    }
+
+    .note-pill.current .key {
+      color: var(--accent);
+    }
+
+    .note-pill.done {
+      opacity: 0.5;
+    }
+
+    .live-hint {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-top: 0.5rem;
+    }
+
+    .white-key.live-next,
+    .black-key.live-next {
+      box-shadow: 0 0 0 2px var(--accent), 0 0 12px rgba(201, 162, 39, 0.4);
+      position: relative;
+      z-index: 3;
+    }
+
+    .white-key.live-next {
+      background: linear-gradient(180deg, #faf0d0 0%, #e8e0b8 100%);
+    }
+
+    .black-key.live-next {
+      background: linear-gradient(180deg, #3d3520 0%, #2d2818 100%);
+      box-shadow: 0 0 0 2px var(--accent), 0 0 12px rgba(201, 162, 39, 0.5);
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Musical Keyboard</h1>
+    <p class="subtitle">Use your laptop keys to play</p>
+
+    <div class="song-section">
+      <div class="song-controls">
+        <label for="songSelect">Song:</label>
+        <select id="songSelect"></select>
+        <button type="button" id="playDemo">Play Demo</button>
+        <button type="button" id="resetSong">Reset</button>
+      </div>
+      <div class="notes-strip" id="notesStrip"></div>
+      <p class="live-hint" id="liveHint">Select a song to see the note shape. The highlighted key is the next one to play.</p>
+    </div>
+
+    <div class="piano-wrap">
+      <div class="piano">
+        <div class="white-keys" id="whiteKeys"></div>
+        <div class="black-keys" id="blackKeys"></div>
+      </div>
+    </div>
+
+    <p class="start-hint" id="startHint">Click here or press any key to enable sound</p>
+    <p class="hint" id="keyHint">
+      <strong>Keys:</strong> White — <kbd>A</kbd> <kbd>S</kbd> <kbd>D</kbd> <kbd>F</kbd> <kbd>G</kbd> <kbd>H</kbd> <kbd>J</kbd> <kbd>K</kbd> <kbd>L</kbd> <kbd>;</kbd> <kbd>'</kbd> <kbd>Z</kbd> <kbd>X</kbd> <kbd>C</kbd> · Black — <kbd>W</kbd> <kbd>E</kbd> <kbd>T</kbd> <kbd>Y</kbd> <kbd>U</kbd> <kbd>I</kbd> <kbd>O</kbd> <kbd>P</kbd> <kbd>[</kbd> <kbd>]</kbd>
+    </p>
+  </div>
+
+  <script>
+    (function() {
+      const A4 = 440;
+      const notes = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
+
+      function freq(noteName) {
+        const match = noteName.match(/^([A-G]#?)(\d+)$/);
+        if (!match) return A4;
+        const [, name, oct] = match;
+        const i = notes.indexOf(name);
+        const octave = parseInt(oct, 10);
+        const semitones = (octave - 4) * 12 + i;
+        return A4 * Math.pow(2, semitones / 12);
+      }
+
+      const whiteNotes = [
+        { note: 'C4', key: 'a' }, { note: 'D4', key: 's' }, { note: 'E4', key: 'd' }, { note: 'F4', key: 'f' },
+        { note: 'G4', key: 'g' }, { note: 'A4', key: 'h' }, { note: 'B4', key: 'j' }, { note: 'C5', key: 'k' },
+        { note: 'D5', key: 'l' }, { note: 'E5', key: ';' }, { note: 'F5', key: "'" }, { note: 'G5', key: 'z' },
+        { note: 'A5', key: 'x' }, { note: 'B5', key: 'c' }
+      ];
+
+      const blackNotes = [
+        null, { note: 'C#4', key: 'w' }, { note: 'D#4', key: 'e' }, null, { note: 'F#4', key: 't' },
+        { note: 'G#4', key: 'y' }, { note: 'A#4', key: 'u' }, null, { note: 'C#5', key: 'i' },
+        { note: 'D#5', key: 'o' }, null, { note: 'F#5', key: 'p' }, { note: 'G#5', key: '[' },
+        { note: 'A#5', key: ']' }, null
+      ];
+
+      const noteToKey = {};
+      whiteNotes.forEach(({ note, key }) => { noteToKey[note] = key; });
+      blackNotes.forEach((data) => { if (data) noteToKey[data.note] = data.key; });
+
+      const SONGS = {
+        'Twinkle Twinkle': [
+          {note:'C4',dur:1},{note:'C4',dur:1},{note:'G4',dur:1},{note:'G4',dur:1},{note:'A4',dur:1},{note:'A4',dur:1},{note:'G4',dur:2},
+          {note:'F4',dur:1},{note:'F4',dur:1},{note:'E4',dur:1},{note:'E4',dur:1},{note:'D4',dur:1},{note:'D4',dur:1},{note:'C4',dur:2},
+          {note:'G4',dur:1},{note:'G4',dur:1},{note:'F4',dur:1},{note:'F4',dur:1},{note:'E4',dur:1},{note:'E4',dur:1},{note:'D4',dur:2},
+          {note:'G4',dur:1},{note:'G4',dur:1},{note:'F4',dur:1},{note:'F4',dur:1},{note:'E4',dur:1},{note:'E4',dur:1},{note:'D4',dur:2},
+          {note:'C4',dur:1},{note:'C4',dur:1},{note:'G4',dur:1},{note:'G4',dur:1},{note:'A4',dur:1},{note:'A4',dur:1},{note:'G4',dur:2},
+          {note:'F4',dur:1},{note:'F4',dur:1},{note:'E4',dur:1},{note:'E4',dur:1},{note:'D4',dur:1},{note:'D4',dur:1},{note:'C4',dur:2}
+        ],
+        'Happy Birthday': [
+          {note:'G4',dur:0.5},{note:'G4',dur:0.5},{note:'A4',dur:1},{note:'G4',dur:1},{note:'C5',dur:1.5},{note:'B4',dur:2},
+          {note:'G4',dur:0.5},{note:'G4',dur:0.5},{note:'A4',dur:1},{note:'G4',dur:1},{note:'D5',dur:1.5},{note:'C5',dur:2},
+          {note:'G4',dur:0.5},{note:'G4',dur:0.5},{note:'G5',dur:1},{note:'E5',dur:1},{note:'C5',dur:1},{note:'B4',dur:1},{note:'A4',dur:2},
+          {note:'F5',dur:0.5},{note:'F5',dur:0.5},{note:'E5',dur:1},{note:'C5',dur:1},{note:'D5',dur:1.5},{note:'C5',dur:2}
+        ],
+        'Jingle Bells': [
+          {note:'E4',dur:1},{note:'E4',dur:1},{note:'E4',dur:2},
+          {note:'E4',dur:1},{note:'E4',dur:1},{note:'E4',dur:2},
+          {note:'E4',dur:1},{note:'G4',dur:1},{note:'C4',dur:0.5},{note:'D4',dur:0.5},{note:'E4',dur:2},
+          {note:'F4',dur:1},{note:'F4',dur:1},{note:'F4',dur:0.5},{note:'F4',dur:0.5},
+          {note:'F4',dur:1},{note:'E4',dur:1},{note:'E4',dur:1},{note:'E4',dur:0.5},{note:'E4',dur:0.5},
+          {note:'E4',dur:1},{note:'D4',dur:1},{note:'D4',dur:1},{note:'E4',dur:1},{note:'D4',dur:1.5},{note:'G4',dur:2},
+          {note:'E4',dur:1},{note:'E4',dur:1},{note:'E4',dur:2},
+          {note:'E4',dur:1},{note:'E4',dur:1},{note:'E4',dur:2},
+          {note:'E4',dur:1},{note:'G4',dur:1},{note:'C4',dur:0.5},{note:'D4',dur:0.5},{note:'E4',dur:2},
+          {note:'F4',dur:1},{note:'F4',dur:1},{note:'F4',dur:0.5},{note:'F4',dur:0.5},
+          {note:'F4',dur:1},{note:'E4',dur:1},{note:'E4',dur:1},{note:'E4',dur:1},
+          {note:'G4',dur:1},{note:'G4',dur:1},{note:'F4',dur:1},{note:'D4',dur:1},{note:'C4',dur:2}
+        ],
+        'Mary Had a Little Lamb': [
+          {note:'E4',dur:0.5},{note:'D4',dur:0.5},{note:'C4',dur:0.5},{note:'D4',dur:0.5},{note:'E4',dur:0.5},{note:'E4',dur:0.5},{note:'E4',dur:1},
+          {note:'D4',dur:0.5},{note:'D4',dur:0.5},{note:'D4',dur:1},{note:'E4',dur:0.5},{note:'G4',dur:0.5},{note:'G4',dur:1},
+          {note:'E4',dur:0.5},{note:'D4',dur:0.5},{note:'C4',dur:0.5},{note:'D4',dur:0.5},{note:'E4',dur:0.5},{note:'E4',dur:0.5},{note:'E4',dur:0.5},{note:'E4',dur:0.5},
+          {note:'D4',dur:0.5},{note:'D4',dur:0.5},{note:'E4',dur:0.5},{note:'D4',dur:0.5},{note:'C4',dur:2}
+        ],
+        'Ode to Joy': [
+          {note:'E4',dur:0.5},{note:'E4',dur:0.5},{note:'F4',dur:0.5},{note:'G4',dur:0.5},{note:'G4',dur:0.5},{note:'F4',dur:0.5},{note:'E4',dur:0.5},{note:'D4',dur:0.5},{note:'C4',dur:0.5},{note:'C4',dur:0.5},{note:'D4',dur:0.5},{note:'E4',dur:0.5},{note:'E4',dur:0.75},{note:'D4',dur:0.25},{note:'D4',dur:1},
+          {note:'E4',dur:0.5},{note:'E4',dur:0.5},{note:'F4',dur:0.5},{note:'G4',dur:0.5},{note:'G4',dur:0.5},{note:'F4',dur:0.5},{note:'E4',dur:0.5},{note:'D4',dur:0.5},{note:'C4',dur:0.5},{note:'C4',dur:0.5},{note:'D4',dur:0.5},{note:'E4',dur:0.5},{note:'D4',dur:0.75},{note:'C4',dur:0.25},{note:'C4',dur:1}
+        ],
+        'Row Row Row Your Boat': [
+          {note:'C4',dur:0.5},{note:'C4',dur:0.5},{note:'C4',dur:0.5},{note:'D4',dur:0.5},{note:'E4',dur:1},
+          {note:'E4',dur:0.5},{note:'D4',dur:0.5},{note:'E4',dur:0.5},{note:'F4',dur:0.5},{note:'G4',dur:1},
+          {note:'C5',dur:0.5},{note:'C5',dur:0.5},{note:'C5',dur:0.5},{note:'G4',dur:0.5},{note:'G4',dur:0.5},{note:'G4',dur:0.5},{note:'E4',dur:0.5},{note:'E4',dur:0.5},{note:'E4',dur:0.5},{note:'C4',dur:0.5},{note:'C4',dur:0.5},{note:'C4',dur:0.5},
+          {note:'G4',dur:0.5},{note:'F4',dur:0.5},{note:'E4',dur:0.5},{note:'D4',dur:0.5},{note:'C4',dur:2}
+        ],
+        'Shape of You': [
+          {note:'E4',dur:0.5},{note:'F#4',dur:0.5},{note:'G#4',dur:0.5},{note:'F#4',dur:0.5},{note:'E4',dur:0.5},{note:'E4',dur:0.5},{note:'F#4',dur:0.5},{note:'F#4',dur:0.5},
+          {note:'E4',dur:0.5},{note:'E4',dur:0.5},{note:'F#4',dur:0.5},{note:'G#4',dur:0.5},{note:'F#4',dur:0.5},{note:'E4',dur:0.5},{note:'E4',dur:0.5},{note:'F#4',dur:0.5},{note:'C#4',dur:0.5},
+          {note:'C#4',dur:0.5},{note:'E4',dur:0.5},{note:'F#4',dur:0.5},{note:'G#4',dur:0.5},{note:'E4',dur:0.5},{note:'E4',dur:0.5},{note:'F#4',dur:0.5},{note:'F#4',dur:0.5},
+          {note:'E4',dur:0.5},{note:'F#4',dur:0.5},{note:'G#4',dur:0.5},{note:'F#4',dur:0.5},{note:'E4',dur:0.5},{note:'F#4',dur:0.5},{note:'C#4',dur:1},
+          {note:'F#4',dur:0.5},{note:'G#4',dur:0.5},{note:'B4',dur:0.5},{note:'G#4',dur:0.5},{note:'F#4',dur:0.5},{note:'E4',dur:0.5},{note:'F#4',dur:0.5},
+          {note:'C#4',dur:0.5},{note:'E4',dur:0.5},{note:'F#4',dur:0.5},{note:'G#4',dur:0.5},{note:'F#4',dur:0.5},{note:'E4',dur:0.5},{note:'F#4',dur:0.5},{note:'C#4',dur:0.5},
+          {note:'C#4',dur:0.5},{note:'C#4',dur:0.5},{note:'C#4',dur:0.5},{note:'E4',dur:0.5},{note:'F#4',dur:0.5},{note:'G#4',dur:0.5},{note:'C#4',dur:0.5},{note:'E4',dur:0.5},{note:'F#4',dur:0.5},{note:'F#4',dur:0.5},
+          {note:'E4',dur:0.5},{note:'F#4',dur:0.5},{note:'G#4',dur:0.5},{note:'F#4',dur:0.5},{note:'E4',dur:0.5},{note:'F#4',dur:0.5},{note:'C#4',dur:1},
+          {note:'C#4',dur:0.5},{note:'C#4',dur:0.5},{note:'E4',dur:0.5},{note:'E4',dur:0.5},{note:'F#4',dur:0.5},{note:'F#4',dur:0.5},{note:'G#4',dur:0.5},{note:'G#4',dur:0.5},
+          {note:'E4',dur:0.5},{note:'F#4',dur:0.5},{note:'G#4',dur:0.5},{note:'F#4',dur:0.5},{note:'E4',dur:0.5},{note:'F#4',dur:0.5},{note:'C#4',dur:1.5}
+        ]
+      };
+
+      let audioCtx = null;
+      let currentSongNotes = [];
+      let songIndex = 0;
+      let demoTimeout = null;
+      let isDemoPlaying = false;
+      const keyToEl = new Map();
+      const keyToNote = new Map();
+
+      function initAudio() {
+        if (audioCtx) return;
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        document.getElementById('startHint').textContent = 'Sound enabled — play with your keyboard!';
+      }
+
+      function playTone(noteName, duration = 0.35) {
+        initAudio();
+        const f = freq(noteName);
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(f, audioCtx.currentTime);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + duration);
+        osc.start(audioCtx.currentTime);
+        osc.stop(audioCtx.currentTime + duration);
+      }
+
+      function keyUp(key) {
+        const el = keyToEl.get(key);
+        if (el) el.classList.remove('pressed');
+      }
+
+      function highlightKeyForNote(note) {
+        document.querySelectorAll('.white-key, .black-key').forEach((el) => el.classList.remove('live-next'));
+        const key = noteToKey[note];
+        if (key) {
+          const el = keyToEl.get(key);
+          if (el) el.classList.add('live-next');
+        }
+      }
+
+      function renderNoteStrip() {
+        const strip = document.getElementById('notesStrip');
+        strip.innerHTML = '';
+        currentSongNotes.forEach((item, i) => {
+          const note = typeof item === 'string' ? item : item.note;
+          const pill = document.createElement('div');
+          pill.className = 'note-pill' + (i === songIndex ? ' current' : '') + (i < songIndex ? ' done' : '');
+          pill.innerHTML = `<span class="note-name">${note.replace(/\d/g, '')}</span><span class="key">${noteToKey[note] || '—'}</span>`;
+          strip.appendChild(pill);
+        });
+        if (currentSongNotes.length > 0 && songIndex < currentSongNotes.length) {
+          const currentItem = currentSongNotes[songIndex];
+          const note = typeof currentItem === 'string' ? currentItem : currentItem.note;
+          highlightKeyForNote(note);
+        } else {
+          highlightKeyForNote(null);
+        }
+      }
+
+      function setSong(songName) {
+        stopDemo();
+        currentSongNotes = SONGS[songName] || [];
+        songIndex = 0;
+        renderNoteStrip();
+      }
+
+      function stopDemo() {
+        if (demoTimeout) {
+          clearTimeout(demoTimeout);
+          demoTimeout = null;
+        }
+        isDemoPlaying = false;
+        const demoBtn = document.getElementById('playDemo');
+        if (demoBtn) {
+          demoBtn.textContent = 'Play Demo';
+          demoBtn.classList.remove('demo-playing');
+          demoBtn.disabled = false;
+        }
+        document.querySelectorAll('.white-key, .black-key').forEach((el) => {
+          el.classList.remove('pressed');
+        });
+      }
+
+      function playDemo() {
+        if (currentSongNotes.length === 0) return;
+        if (isDemoPlaying) {
+          stopDemo();
+          return;
+        }
+        initAudio();
+        isDemoPlaying = true;
+        songIndex = 0;
+        renderNoteStrip();
+        const demoBtn = document.getElementById('playDemo');
+        demoBtn.textContent = 'Stop Demo';
+        demoBtn.classList.add('demo-playing');
+        const tempo = 120;
+        const beatDuration = (60 / tempo) * 1000;
+        let timeoutId = null;
+        function playNextNote() {
+          if (!isDemoPlaying || songIndex >= currentSongNotes.length) {
+            stopDemo();
+            return;
+          }
+          const item = currentSongNotes[songIndex];
+          const note = typeof item === 'string' ? item : item.note;
+          const duration = typeof item === 'string' ? 0.5 : item.dur;
+          const key = noteToKey[note];
+          if (key) {
+            const el = keyToEl.get(key);
+            if (el) {
+              el.classList.add('pressed');
+              const notePlayDuration = Math.min(duration * 0.8, 0.5);
+              playTone(note, notePlayDuration);
+              setTimeout(() => {
+                el.classList.remove('pressed');
+              }, duration * beatDuration * 0.6);
+            }
+          }
+          songIndex++;
+          renderNoteStrip();
+          const nextItem = currentSongNotes[songIndex];
+          if (nextItem) {
+            const nextDuration = typeof nextItem === 'string' ? 0.5 : nextItem.dur;
+            demoTimeout = setTimeout(playNextNote, duration * beatDuration);
+          } else {
+            demoTimeout = setTimeout(() => stopDemo(), duration * beatDuration);
+          }
+        }
+        playNextNote();
+      }
+
+      function keyDown(key) {
+        if (isDemoPlaying) return;
+        const data = keyToNote.get(key);
+        if (!data) return;
+        const el = keyToEl.get(key);
+        if (el && !el.classList.contains('pressed')) {
+          el.classList.add('pressed');
+          playTone(data.note);
+        }
+        if (currentSongNotes.length > 0 && songIndex < currentSongNotes.length) {
+          const currentItem = currentSongNotes[songIndex];
+          const note = typeof currentItem === 'string' ? currentItem : currentItem.note;
+          if (key === noteToKey[note]) {
+            songIndex++;
+            renderNoteStrip();
+          }
+        }
+      }
+
+      const whiteKeysEl = document.getElementById('whiteKeys');
+      const blackKeysEl = document.getElementById('blackKeys');
+
+      whiteNotes.forEach(({ note, key }) => {
+        const el = document.createElement('div');
+        el.className = 'white-key';
+        el.setAttribute('data-key', key);
+        el.innerHTML = `<span class="key-label">${key}</span>`;
+        el.addEventListener('mousedown', () => { initAudio(); keyDown(key); });
+        el.addEventListener('mouseleave', () => keyUp(key));
+        el.addEventListener('mouseup', () => keyUp(key));
+        whiteKeysEl.appendChild(el);
+        keyToEl.set(key, el);
+        keyToNote.set(key, { note });
+      });
+
+      blackNotes.forEach((data) => {
+        const slot = document.createElement('div');
+        slot.className = 'black-key-slot' + (data ? '' : ' empty');
+        if (data) {
+          const el = document.createElement('div');
+          el.className = 'black-key';
+          el.setAttribute('data-key', data.key);
+          el.innerHTML = `<span class="key-label">${data.key}</span>`;
+          el.addEventListener('mousedown', () => { initAudio(); keyDown(data.key); });
+          el.addEventListener('mouseleave', () => keyUp(data.key));
+          el.addEventListener('mouseup', () => keyUp(data.key));
+          slot.appendChild(el);
+          keyToEl.set(data.key, el);
+          keyToNote.set(data.key, { note: data.note });
+        }
+        blackKeysEl.appendChild(slot);
+      });
+
+      document.addEventListener('keydown', (e) => {
+        if (e.repeat) return;
+        const key = e.key.toLowerCase();
+        keyDown(key);
+      });
+
+      document.addEventListener('keyup', (e) => {
+        keyUp(e.key.toLowerCase());
+      });
+
+      document.getElementById('startHint').addEventListener('click', initAudio);
+
+      const songSelect = document.getElementById('songSelect');
+      Object.keys(SONGS).forEach((name) => {
+        const opt = document.createElement('option');
+        opt.value = name;
+        opt.textContent = name;
+        songSelect.appendChild(opt);
+      });
+      songSelect.addEventListener('change', () => setSong(songSelect.value));
+      document.getElementById('playDemo').addEventListener('click', () => {
+        if (currentSongNotes.length === 0) {
+          setSong(songSelect.value);
+        }
+        playDemo();
+      });
+      document.getElementById('resetSong').addEventListener('click', () => {
+        stopDemo();
+        songIndex = 0;
+        renderNoteStrip();
+      });
+      setSong(Object.keys(SONGS)[0]);
+    })();
+  </script>
+</body>
+</html>

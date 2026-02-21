@@ -1,0 +1,9 @@
+{
+  "name": "musical-keyboard",
+  "version": "1.0.0",
+  "description": "Play music using your laptop keyboard with a piano-style UI",
+  "scripts": {
+    "start": "npx -y serve -l 3000",
+    "run": "npx -y serve -l 3000"
+  }
+}
